@@ -17,7 +17,6 @@ terraform {
     }
   }
 
-/*
   # Update this block with the location of your terraform state file
   backend "azurerm" {
     resource_group_name  = "terraform-sc-rg"
@@ -32,7 +31,6 @@ terraform {
     client_secret         = "sHw8Q~qDrutv_7ZT.~BxNoSauALTk~e4WLJd0boK"
     tenant_id             = "4beecb38-fbf2-4aa5-aa0a-4aec609a959a"
   }
-  */
 }
 
 
