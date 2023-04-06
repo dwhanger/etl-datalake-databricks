@@ -18,6 +18,7 @@ terraform {
   }
 
   # Update this block with the location of your terraform state file
+/*
   backend "azurerm" {
     resource_group_name  = "terraform-sc-rg"
     storage_account_name = "tysdscinfratfsa"
@@ -25,14 +26,13 @@ terraform {
     key                  = "devintus-stack"
     use_oidc             = true
 ###
-/*
     access_key           = ""
     subscription_id      = ""
     client_id            = ""
     client_secret        = ""
     tenant_id            = ""
-*/
   }
+  */
 }
 
 
