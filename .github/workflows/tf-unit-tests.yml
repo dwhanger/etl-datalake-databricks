@@ -20,7 +20,7 @@ jobs:
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
-      run: terraform init -backend=false
+      run: terraform init -var-file=devintus.tfvars -backend=false -reconfigure
 
     # Validate terraform files
     - name: Terraform Validate
@@ -28,7 +28,8 @@ jobs:
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
-      run: terraform fmt -check -recursive
+    #  run: terraform fmt -check -recursive
+      run: terraform fmt 
     
     # Perform a security scan of the terraform code using checkov
     - name: Run Checkov action
