@@ -60,7 +60,7 @@ jobs:
       id: tf-plan
       run: |
         export exitcode=0
-        terraform plan -backend-config="client_id=$ARM_CLIENT_ID" -backend-config="client_secret=$ARM_CLIENT_SECRET" -detailed-exitcode -out tfplan || export exitcode=$?
+        terraform plan -detailed-exitcode -out tfplan || export exitcode=$?
 
         echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
         
