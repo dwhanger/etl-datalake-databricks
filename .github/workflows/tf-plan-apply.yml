@@ -78,7 +78,6 @@ jobs:
     - name: Terraform Plan
       id: tf-plan
       run: |
-        export TF_CLI_ARGS_plan='-backend-config=tenant_id=4beecb38-fbf2-4aa5-aa0a-4aec609a959a'
         export TF_VAR_subscriptionid=dfd44adf-0b1d-4309-b742-988a91722fe7
         export TF_VAR_tenantid=4beecb38-fbf2-4aa5-aa0a-4aec609a959a
         export TF_VAR_clientid=fe5a7e5d-c3e9-49a7-a9cf-aef07d968c30
