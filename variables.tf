@@ -22,6 +22,11 @@ variable "clientid" {
   description = "Client id for the tf service principal..."
   default     = ""
 }
+variable "clientsecret" {
+  description = "Client secret for the tf service principal..."
+  default     = ""
+}
+
 
 variable "name" {
   description = "Name to be used as basis for all resources."
