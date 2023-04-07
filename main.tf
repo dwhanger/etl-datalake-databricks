@@ -25,12 +25,13 @@ terraform {
     key                  = "devintus-stack"
 #    use_oidc             = true
 ###
-    access_key            = "z05NUiT6goa2mIrSUrs7u9iIe9KE+D4sDvxIjPhhOHrrfpFKyDRU1T7g1XDwlv1x8fXL7ChIlOOA+AStOgdFhg=="
-    subscription_id       = "dfd44adf-0b1d-4309-b742-988a91722fe7"
-    client_id             = "fe5a7e5d-c3e9-49a7-a9cf-aef07d968c30"
-    client_secret         = "sHw8Q~qDrutv_7ZT.~BxNoSauALTk~e4WLJd0boK"
-    tenant_id             = "4beecb38-fbf2-4aa5-aa0a-4aec609a959a"
+    access_key            = env.ARM_ACCESS_KEY
+    subscription_id       = env.ARM_SUBSCRIPTION_ID
+    client_id             = env.ARM_CLIENT_ID
+    client_secret         = env.ARM_CLIENT_SECRET
+    tenant_id             = env.ARM_TENANT_ID
   }
+  
 }
 
 
