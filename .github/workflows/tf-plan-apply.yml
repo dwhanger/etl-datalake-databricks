@@ -78,10 +78,10 @@ jobs:
     - name: Terraform Plan
       id: tf-plan
       run: |
-        export TF_VAR_subscriptionid=dfd44adf-0b1d-4309-b742-988a91722fe7
-        export TF_VAR_tenantid=4beecb38-fbf2-4aa5-aa0a-4aec609a959a
-        export TF_VAR_clientid=fe5a7e5d-c3e9-49a7-a9cf-aef07d968c30
-        export TF_VAR_clientsecret=sHw8Q~qDrutv_7ZT.~BxNoSauALTk~e4WLJd0boK
+        export TF_VAR_subscriptionid=${{ env.SUBSCRIPTION_ID }}
+        export TF_VAR_tenantid=${{ env.ARM_TENANT_ID }}
+        export TF_VAR_clientid=${{ env.ARM_CLIENT_ID }}
+        export TF_VAR_clientsecret=${{ env.ARM_CLIENT_SECRET }}
         export exitcode=0
         terraform plan -var-file=devintus.tfvars -detailed-exitcode -out tfplan || export exitcode=$?
 
