@@ -1,5 +1,6 @@
-objectid = "ae9480f8-724b-4719-81ff-6b9097b65d9e"
-operatorObjectid = "f5b159ec-4195-4cab-95b1-6c16853965f8"
+azcliObjectid = "ae9480f8-724b-4719-81ff-6b9097b65d9e"
+operatorDMWObjectid = "f5b159ec-4195-4cab-95b1-6c16853965f8"
+adfObjectid = "72860e6a-d7a8-428f-a0a9-c0e68c79bde8"
 location = "southcentralus"
 name = "databricks"
 short_name = "data"

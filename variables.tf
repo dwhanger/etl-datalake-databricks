@@ -8,13 +8,18 @@ variable "tenantid" {
   default     = ""
 }
 
-variable "objectid" {
+variable "azcliObjectid" {
   description = "Object id for the tf service principal..."
   default     = ""
 }
 
-variable "operatorObjectid" {
+variable "operatorDMWObjectid" {
   description = "Object id for the user operator running the tf script from command line...needed for provisioning the keyvault..."
+  default     = ""
+}
+
+variable "adfObjectid" {
+  description = "Object id for the ADF-Owner group, eg: Dev-ADF-Owner or QA-ADF-Owner...needed for setting ACLs on datalake folders..."
   default     = ""
 }
 

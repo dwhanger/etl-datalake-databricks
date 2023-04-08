@@ -368,14 +368,15 @@ resource "azurerm_storage_account" "databricks_sa" {
 
 #
 # Go get the object_id for the group name...
+#.....need a P2 license for the following to work because the group needs to be able to have roles assignable to it, eg: Group.Read.All
 #
-data "azuread_group" "adgroup_adf_owner" {
-  display_name     = var.aad_group_env_adf_folder_owner
-  security_enabled = true
-}
+#data "azuread_group" "adgroup_adf_owner" {
+#  display_name     = var.aad_group_env_adf_folder_owner
+#  security_enabled = true
+#}
 
 resource "azurerm_storage_data_lake_gen2_filesystem" "databricks_sa_data_lake_gen2" {
-  depends_on = [data.azuread_group.adgroup_adf_owner]
+#  depends_on = [data.azuread_group.adgroup_adf_owner]
   name               = "inbound"
   storage_account_id = azurerm_storage_account.databricks_sa.id
 /*
@@ -454,7 +455,8 @@ resource "azurerm_storage_data_lake_gen2_path" "acl_payer_Baseball_theFolders" {
     content {
         type = "group"
         scope = ace.value
-        id = data.azuread_group.adgroup_adf_owner.object_id
+#        id = data.azuread_group.adgroup_adf_owner.object_id
+        id = var.adfObjectid
         permissions = "rwx"
     }
   }
@@ -497,7 +499,8 @@ resource "azurerm_storage_data_lake_gen2_path" "acl_payer_DirectMail_theFolders"
     content {
         type = "group"
         scope = ace.value
-        id = data.azuread_group.adgroup_adf_owner.object_id
+#        id = data.azuread_group.adgroup_adf_owner.object_id
+        id = var.adfObjectid
         permissions = "rwx"
     }
   }
@@ -520,7 +523,8 @@ resource "azurerm_storage_data_lake_gen2_path" "acl_payer_HomeCredit_theFolders"
     content {
         type = "group"
         scope = ace.value
-        id = data.azuread_group.adgroup_adf_owner.object_id
+#        id = data.azuread_group.adgroup_adf_owner.object_id
+        id = var.adfObjectid
         permissions = "rwx"
     }
   }
@@ -543,7 +547,8 @@ resource "azurerm_storage_data_lake_gen2_path" "acl_payer_Models_theFolders" {
     content {
         type = "group"
         scope = ace.value
-        id = data.azuread_group.adgroup_adf_owner.object_id
+#        id = data.azuread_group.adgroup_adf_owner.object_id
+        id = var.adfObjectid
         permissions = "rwx"
     }
   }
@@ -566,7 +571,8 @@ resource "azurerm_storage_data_lake_gen2_path" "acl_payer_PowerCurve_theFolders"
     content {
         type = "group"
         scope = ace.value
-        id = data.azuread_group.adgroup_adf_owner.object_id
+#        id = data.azuread_group.adgroup_adf_owner.object_id
+        id = var.adfObjectid
         permissions = "rwx"
     }
   }
@@ -640,7 +646,7 @@ resource "azurerm_key_vault_access_policy" "azure_cli_policy" {
 
   key_vault_id = azurerm_key_vault.keyvault.id
   tenant_id = var.tenantid
-  object_id = var.objectid
+  object_id = var.azcliObjectid
 
   key_permissions = [
       "Create", "List", "Get", "Delete", "Purge", "UnwrapKey", "WrapKey", "GetRotationPolicy", "SetRotationPolicy"
@@ -651,7 +657,7 @@ resource "azurerm_key_vault_access_policy" "azure_dmw_policy" {
 
   key_vault_id = azurerm_key_vault.keyvault.id
   tenant_id = var.tenantid
-  object_id = var.operatorObjectid
+  object_id = var.operatorDMWObjectid
 
   key_permissions = [
       "Create", "List", "Get", "Delete", "Purge", "UnwrapKey", "WrapKey", "GetRotationPolicy", "SetRotationPolicy"
