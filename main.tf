@@ -818,6 +818,7 @@ resource "azurerm_role_assignment" "adf-data-reader-role" {
   principal_id = azurerm_user_assigned_identity.uaidentity.principal_id
 }
 
+
 #######################################################################################
 # auth.terraform 
 locals {
