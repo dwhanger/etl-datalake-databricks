@@ -21,19 +21,19 @@ provider "registry.terraform.io/azure/azapi" {
 }
 
 provider "registry.terraform.io/databricks/databricks" {
-  version = "1.13.0"
+  version = "1.15.0"
   hashes = [
-    "h1:bgoYi9prAODRkQre4Lufi5faBW1a6ymZ4v/aqgvJcUk=",
-    "zh:1f043e67b45749a0c58638b62b5859e367931e72f3b91c8e12151fe6222ab672",
-    "zh:32db31687e501c55412c97b998bfd853f21ef302a2b562abefc9bc2a3bbdabf2",
-    "zh:7d092ac4a1e079c482ecbe541518dff756adcf7f80cac9f7e8152ee93673bcae",
-    "zh:90a1700cbe727597c2e1fc7f27b1e41531a16dbbfad3fd7e1a31de270b4e80d5",
-    "zh:9338406075c45eb732a55927479c114759b6fb24a819e8c744317b57ec04af41",
-    "zh:b17faafdcc8e69d890037683538eb3a8d92279efd2bc1c9a4b3e1351981218f5",
-    "zh:e0c603a36facc6724ef512a946e5793fb2e021bbecc68ae7993a4f5f6bcd4d92",
-    "zh:ec5b3ab15be55e1da39c04afe02ab6b9b37f0c9135284c6df22358dc7d253316",
-    "zh:ef236b53004957e6f3ef19892ce046d90cddc260cbf54acc14ea736d7f365f61",
-    "zh:f841ea8f17d65dd8a51d6ff7728f17ccb2aaa04e43e6baa65235cc8960b77a4f",
+    "h1:tPzxOCZlL/owy6Xj7ZchkQbHk+cN79pPjZ2pu2Pat+U=",
+    "zh:0fd54e994831f09cb65783e1afa76e49a286ffd6cabba6b20dd748dd0c8f8346",
+    "zh:48ea75bbaaf8a128f41d9c6326396a0a9b16dd5c8402b49f63beb1b9325263ed",
+    "zh:5bc62693a876e63caac8119004a8739bcd9b270410c4b53f5b4972ca36131fbd",
+    "zh:63e046000d21afb2a8048c6f87c52261cc095b80372b787605ad772400c67951",
+    "zh:847d8a9a33b0f81561a05dc04f5a60a69ef3e52cf642dbdcc8f0f41463e44f87",
+    "zh:8c6e48b045b261cbd21b1f049e0fa75898a70af09fa0a441ce0fc5a80ec1ab06",
+    "zh:ad1221b0cdab439399d1090948b34dd03d0f64c1a98837800900c1e331b30a7a",
+    "zh:b53812266fefc4e3e80cd63b902faf382eb5c058d6eb8b7fddb3345c0c95d36f",
+    "zh:d7a0fd988aee64db665cbc58d48d0d7da9a35c3d56b28d14f2cdb8e042dc042a",
+    "zh:ed8afb65e4a06ca37058a5774a3a2b336af40cf0f8e4f0eb375e3425abbfa9a0",
   ]
 }
 
