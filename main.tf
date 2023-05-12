@@ -17,24 +17,6 @@ terraform {
     }
   }
 
-/*
-  # Update this block with the location of your terraform state file
-  backend "azurerm" {
-    resource_group_name  = "terraform-sc-rg"
-    storage_account_name = "tysdscinfratfsa"
-    container_name       = "databricks"
-    key                  = "devintus-stack"
-#    use_oidc             = true
-###
-
-    access_key            = env.ARM_ACCESS_KEY
-    subscription_id       = env.ARM_SUBSCRIPTION_ID
-    client_id             = env.ARM_CLIENT_ID
-    client_secret         = env.ARM_CLIENT_SECRET
-    tenant_id             = env.ARM_TENANT_ID
-
-  }
-*/
   backend "azurerm" {}
 }
 
@@ -59,6 +41,13 @@ provider "azurerm" {
 //  skip_credentials_validation
 }
 
+data "azurerm_client_config" "current" {}
+
+locals {
+  tenant_id       = data.azurerm_client_config.current.tenant_id 
+  subscription_id = data.azurerm_client_config.current.subscription_id 
+  object_id       = data.azurerm_client_config.current.object_id  
+}
 
 locals {
   tags = {
@@ -622,17 +611,36 @@ resource "azurerm_user_assigned_identity" "uaidentity" {
   location            = azurerm_resource_group.main.location
 }
 
-
 resource "azurerm_key_vault" "keyvault" {
 
   name                     = "${local.kv_name}-kv"
   location                 = azurerm_resource_group.main.location
   resource_group_name      = azurerm_resource_group.main.name
-  tenant_id                = var.tenantid
+  tenant_id                = local.tenant_id 
   sku_name                 = "premium"
   purge_protection_enabled = true
   soft_delete_retention_days = 7
   
+access_policy {
+    tenant_id = local.tenant_id
+    object_id = local.object_id
+
+    key_permissions = [
+      "Create",
+      "Delete",
+      "Get",
+      "Purge",
+      "Recover",
+      "Update",
+      "GetRotationPolicy",
+      "SetRotationPolicy"
+    ]
+
+    secret_permissions = [
+      "Set",
+    ]
+  }    
+
   network_acls {
     bypass         = "AzureServices"
     default_action = "Deny"
@@ -641,42 +649,71 @@ resource "azurerm_key_vault" "keyvault" {
     virtual_network_subnet_ids = [azurerm_subnet.subnet_addressDataFactory.id]
   }
 }
-
+/*
 resource "azurerm_key_vault_access_policy" "azure_cli_policy" {
 
   key_vault_id = azurerm_key_vault.keyvault.id
-  tenant_id = var.tenantid
-  object_id = var.azcliObjectid
+  tenant_id = local.tenant_id
+  object_id = local.object_id
 
   key_permissions = [
-      "Create", "List", "Get", "Delete", "Purge", "UnwrapKey", "WrapKey", "GetRotationPolicy", "SetRotationPolicy"
+      "Create", "List", "Get", "Delete", "Purge", "Recover", "Restore", "UnwrapKey", "WrapKey", "GetRotationPolicy", "SetRotationPolicy", "Rotate", "Release", "Update", "Verify", "Decrypt", "Encrypt", "Sign"
   ]
+
+  secret_permissions = [
+      "List", "Get", "Delete", "Recover", "Restore", "Set"
+  ]
+
+  certificate_permissions = [
+      "Create", "List", "Get", "Delete", "Purge", "Recover", "Restore"
+  ]
+
 }
+*/
 
 resource "azurerm_key_vault_access_policy" "azure_dmw_policy" {
 
   key_vault_id = azurerm_key_vault.keyvault.id
-  tenant_id = var.tenantid
+  tenant_id = local.tenant_id
   object_id = var.operatorDMWObjectid
 
   key_permissions = [
-      "Create", "List", "Get", "Delete", "Purge", "UnwrapKey", "WrapKey", "GetRotationPolicy", "SetRotationPolicy"
+      "Create", "List", "Get", "Delete", "Purge", "Recover", "Restore", "UnwrapKey", "WrapKey", "GetRotationPolicy", "SetRotationPolicy", "Rotate", "Release", "Update", "Verify", "Decrypt", "Encrypt", "Sign"
   ]
+
+  secret_permissions = [
+      "List", "Get", "Delete", "Recover", "Restore", "Set"
+  ]
+
+  certificate_permissions = [
+      "Create", "List", "Get", "Delete", "Purge", "Recover", "Restore"
+  ]
+
 }
+
 
 resource "azurerm_key_vault_access_policy" "azure_uaidentity_policy" {
 
   key_vault_id = azurerm_key_vault.keyvault.id
-  tenant_id = var.tenantid
+  tenant_id = local.tenant_id
   object_id = azurerm_user_assigned_identity.uaidentity.principal_id
 
   key_permissions = [
-      "Create", "List", "Get", "Delete", "Purge", "UnwrapKey", "WrapKey", "GetRotationPolicy", "SetRotationPolicy"
+      "Create", "List", "Get", "Delete", "Purge", "Recover", "Restore", "UnwrapKey", "WrapKey", "GetRotationPolicy", "SetRotationPolicy", "Rotate", "Release", "Update", "Verify", "Decrypt", "Encrypt", "Sign"
   ]
+
+  secret_permissions = [
+      "List", "Get", "Delete", "Recover", "Restore", "Set"
+  ]
+
+  certificate_permissions = [
+      "Create", "List", "Get", "Delete", "Purge", "Recover", "Restore"
+  ]
+
 }
 
 resource "azurerm_key_vault_key" "keyvaultkey" {
-  depends_on = [azurerm_key_vault_access_policy.azure_dmw_policy]
+#  depends_on = [azurerm_key_vault_access_policy.azure_dmw_policy]
 
   name         = "${local.kv_name}-ke"
   key_vault_id = azurerm_key_vault.keyvault.id
@@ -739,8 +776,75 @@ resource "azurerm_databricks_workspace" "databricks_workspace" {
   tags = local.tags
 }
 
+
+resource "azurerm_databricks_workspace_customer_managed_key" "databrickscmkey" {
+  depends_on = [azurerm_key_vault_key.cmkey]
+
+  workspace_id     = azurerm_databricks_workspace.databricks_workspace[0].id
+  key_vault_key_id = azurerm_key_vault_key.cmkey.id 
+}
+
+resource "azurerm_key_vault_key" "cmkey" {
+#  depends_on = [azurerm_key_vault_access_policy.azure_cli_policy]
+
+  name         = "databrickscmkey-certificate"
+  key_vault_id = azurerm_key_vault.keyvault.id
+  key_type     = "RSA"
+  key_size     = 2048
+
+  key_opts = [
+    "decrypt",
+    "encrypt",
+    "sign",
+    "unwrapKey",
+    "verify",
+    "wrapKey",
+  ]
+}
+
+/*
+resource "azurerm_key_vault_access_policy" "terraform" {
+  key_vault_id = azurerm_key_vault.keyvault.id
+  tenant_id    = local.tenant_id
+  object_id    = data.azurerm_client_config.current.object_id 
+
+  key_permissions = [
+    "Create",
+    "Delete",
+    "Get",
+    "Purge",
+    "Recover",
+    "Update",
+    "List",
+    "Decrypt",
+    "Sign",
+    "GetRotationPolicy",
+  ]
+}
+*/
+
+resource "azurerm_key_vault_access_policy" "databricks" {
+  depends_on = [azurerm_databricks_workspace.databricks_workspace]
+
+  key_vault_id = azurerm_key_vault.keyvault.id
+  tenant_id    = azurerm_databricks_workspace.databricks_workspace[0].storage_account_identity.0.tenant_id
+  object_id    = azurerm_databricks_workspace.databricks_workspace[0].storage_account_identity.0.principal_id
+
+  key_permissions = [
+    "Create",
+    "Delete",
+    "Get",
+    "Purge",
+    "Recover",
+    "Update",
+    "List",
+    "Decrypt",
+    "Sign"
+  ]
+}
+
 locals {
-  df_temp_name = "${var.short_name}${var.environment}-${var.region}-${var.platform}-${var.name}-df"
+  df_temp_name = "${var.short_name}${var.environment}-${var.region}-${var.platform}-${var.name}"
   df_base_name = lower(replace(local.df_temp_name, "/[[:^alnum:]]/", ""))
   df_name = "${substr(
     local.df_base_name,
@@ -761,16 +865,6 @@ resource "azurerm_data_factory" "data_factoryv2" {
   #
   # Add this block of code only for the devint stack, not for qa, stage, or prod
   # 
-
-//  vsts_configuration  {
-//    account_name    = var.vsts_account_name
-//    branch_name     = var.vsts_branch_name
-//    project_name    = var.vsts_project_name
-//    repository_name = var.vsts_repository_name
-//    root_folder     = var.vsts_root_folder
-//    tenant_id       = var.vsts_tenant_id
-//  }
-
    dynamic "github_configuration" {
     for_each = var.devops_git_setup
     content {
@@ -802,6 +896,7 @@ resource "azurerm_data_factory_integration_runtime_azure_ssis" "data_factoryv2_i
   }
 }
 
+/*
 resource "azurerm_role_assignment" "adf-data-contributor-role" {
   depends_on = [azurerm_data_factory.data_factoryv2]
 
@@ -817,26 +912,23 @@ resource "azurerm_role_assignment" "adf-data-reader-role" {
   role_definition_name = "Storage Blob Data Reader"
   principal_id = azurerm_user_assigned_identity.uaidentity.principal_id
 }
-
+*/
 
 #######################################################################################
 # auth.terraform 
 locals {
-  subscription_id           = var.subscriptionid
   resource_group            = azurerm_resource_group.main.name
   databricks_workspace_name = azurerm_databricks_workspace.databricks_workspace[0].name
-  tenant_id                 = var.tenantid
   databricks_workspace_host = azurerm_databricks_workspace.databricks_workspace[0].workspace_url
   databricks_workspace_id   = azurerm_databricks_workspace.databricks_workspace[0].workspace_id
 }
-
+/*
+//
+// This should have worked but didn't...needed to embed the ARM template below for this...
 provider "azapi" {
   subscription_id = var.subscriptionid
 }
 
-//
-// This should have worked but didn't...needed to embed the ARM template below for this...
-/*
 resource "azapi_resource" "access_connector" {
   type      = "Microsoft.Databricks/accessConnectors@2022-10-01-preview"
   name      = "${local.ws_name}-databricks-mi"
@@ -919,6 +1011,7 @@ resource "azurerm_resource_group_template_deployment" "template" {
 TEMPLATE
 
 }
+
 /*
 data "azurerm_user_assigned_identity" "example" {
   name                = azurerm_user_assigned_identity.uaidentity.name

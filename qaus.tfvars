@@ -1,5 +1,6 @@
-objectid = "ae9480f8-724b-4719-81ff-6b9097b65d9e"
-operatorObjectid = "f5b159ec-4195-4cab-95b1-6c16853965f8"
+azcliObjectid = "ae9480f8-724b-4719-81ff-6b9097b65d9e"
+operatorDMWObjectid = "<operatorDMWObjectid for qa>"
+adfObjectid = "<adfObjectid for stage>"
 location = "southcentralus"
 name = "databricks"
 short_name = "data"
@@ -21,10 +22,10 @@ key_vault_resourcegroup = "terraform-sc-rg"
 repo_account_name = "dwhanger"
 repo_branch_name = "main"
 repo_git_url = "https://github.com"
-repo_repository_name = "etl-datalake-synapse"
+repo_repository_name = "etl-datalake-databricks"
 repo_adf_root_folder = "/adf"
-repo_syn_root_folder = "/synapse"
+repo_syn_root_folder = "/databricks"
 repo_tenant_id = "4beecb38-fbf2-4aa5-aa0a-4aec609a959a"
+aad_group_env_adf_folder_owner = "QA-ADF-Owner"
 //devops_git_setup = ["qa"]         //unset this variable so there is nothing in the set to loop through and process
-enable_synapse_creation = true
-
+enable_databricks_creation = true
