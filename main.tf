@@ -114,7 +114,6 @@ locals {
 }
 
 resource "azurerm_resource_group" "main" {
-#  depends_on = [null_resource.delete_the_generated_files]
 
   name     = "${var.short_name}${var.environment}-${var.region}-${var.platform}-${var.name}-rg"
   location = var.location
@@ -365,7 +364,6 @@ resource "azurerm_storage_account" "databricks_sa" {
 #}
 
 resource "azurerm_storage_data_lake_gen2_filesystem" "databricks_sa_data_lake_gen2" {
-#  depends_on = [data.azuread_group.adgroup_adf_owner]
   name               = "inbound"
   storage_account_id = azurerm_storage_account.databricks_sa.id
 /*
@@ -578,7 +576,6 @@ resource "azurerm_storage_data_lake_gen2_path" "acl_payer_PowerCurve_theFolders"
 #.....az command works from the command line but not from within TF.....using the tf object model below, works like a champ!
 #
 data "azurerm_key_vault" "data_terraform_akv" {
-#  depends_on = [azurerm_storage_data_lake_gen2_path.acl_payer_PowerCurve_theFolders]
 
   name                = var.key_vault_name
   resource_group_name = var.key_vault_resourcegroup
@@ -713,7 +710,6 @@ resource "azurerm_key_vault_access_policy" "azure_uaidentity_policy" {
 }
 
 resource "azurerm_key_vault_key" "keyvaultkey" {
-#  depends_on = [azurerm_key_vault_access_policy.azure_dmw_policy]
 
   name         = "${local.kv_name}-ke"
   key_vault_id = azurerm_key_vault.keyvault.id
@@ -752,8 +748,6 @@ locals {
 resource "azurerm_databricks_workspace" "databricks_workspace" {
   count = var.enable_databricks_creation ? 1 : 0
 
-#  depends_on = [data.azurerm_key_vault_secret.vsts_pat_keyvault_secret]
-
   name                                      = local.ws_name
   resource_group_name                       = azurerm_resource_group.main.name
   location                                  = azurerm_resource_group.main.location
@@ -785,7 +779,6 @@ resource "azurerm_databricks_workspace_customer_managed_key" "databrickscmkey" {
 }
 
 resource "azurerm_key_vault_key" "cmkey" {
-#  depends_on = [azurerm_key_vault_access_policy.azure_cli_policy]
 
   name         = "databrickscmkey-certificate"
   key_vault_id = azurerm_key_vault.keyvault.id
@@ -801,27 +794,6 @@ resource "azurerm_key_vault_key" "cmkey" {
     "wrapKey",
   ]
 }
-
-/*
-resource "azurerm_key_vault_access_policy" "terraform" {
-  key_vault_id = azurerm_key_vault.keyvault.id
-  tenant_id    = local.tenant_id
-  object_id    = data.azurerm_client_config.current.object_id 
-
-  key_permissions = [
-    "Create",
-    "Delete",
-    "Get",
-    "Purge",
-    "Recover",
-    "Update",
-    "List",
-    "Decrypt",
-    "Sign",
-    "GetRotationPolicy",
-  ]
-}
-*/
 
 resource "azurerm_key_vault_access_policy" "databricks" {
   depends_on = [azurerm_databricks_workspace.databricks_workspace]
@@ -895,24 +867,6 @@ resource "azurerm_data_factory_integration_runtime_azure_ssis" "data_factoryv2_i
     subnet_name = azurerm_subnet.subnet_addressDataFactory.name
   }
 }
-
-/*
-resource "azurerm_role_assignment" "adf-data-contributor-role" {
-  depends_on = [azurerm_data_factory.data_factoryv2]
-
-  scope                = azurerm_storage_account.databricks_sa.id
-  role_definition_name = "Storage Blob Data Contributor"
-  principal_id = azurerm_user_assigned_identity.uaidentity.principal_id
-}
-
-resource "azurerm_role_assignment" "adf-data-reader-role" {
-  depends_on = [azurerm_data_factory.data_factoryv2]
-
-  scope                = azurerm_storage_account.databricks_sa.id
-  role_definition_name = "Storage Blob Data Reader"
-  principal_id = azurerm_user_assigned_identity.uaidentity.principal_id
-}
-*/
 
 #######################################################################################
 # auth.terraform 
