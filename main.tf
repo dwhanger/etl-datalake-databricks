@@ -109,7 +109,8 @@ locals {
           "40.82.252.0/24",
           "20.42.134.0/23",
           //my local ip....this can not have a /32 it will fail and you will be left wondering why it failed...chasing your tail
-          "76.138.138.227"
+          "76.138.138.227",
+          "20.51.128.131"
   ]
 }
 
