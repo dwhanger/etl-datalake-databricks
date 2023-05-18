@@ -65,6 +65,7 @@ locals {
 //
 // IP addresses of ADO machines around the globe to let in...
 //
+//
 locals {
   devops = [
           "20.37.158.0/23",
