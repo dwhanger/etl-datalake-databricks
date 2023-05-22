@@ -109,10 +109,19 @@ locals {
           "40.74.28.0/23",
           "40.82.252.0/24",
           "20.42.134.0/23",
-          //my local ip....this can not have a /32 it will fail and you will be left wondering why it failed...chasing your tail
-          "76.138.138.227",
-          "20.51.128.131"
+          "76.138.138.227"
   ]
+}
+
+//
+// IP addresses of Github Actions machines around the globe to let in...
+//
+//
+data "local_file" "githubactions_ipaddresses" {
+  filename = "${path.module}/githubactions_ipaddresses.txt"
+}
+locals {
+  githubactions_ipaddresses = split(",",trimspace(data.local_file.githubactions_ipaddresses.content))
 }
 
 resource "azurerm_resource_group" "main" {
@@ -644,7 +653,8 @@ access_policy {
     bypass         = "AzureServices"
     default_action = "Deny"
 #    ip_rules       = ["20.51.251.83","20.98.103.209","98.232.189.107","13.65.175.147"]
-    ip_rules       = local.devops
+#    ip_rules       = local.devops
+    ip_rules       = local.githubactions_ipaddresses
     virtual_network_subnet_ids = [azurerm_subnet.subnet_addressDataFactory.id]
   }
 }
