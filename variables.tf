@@ -176,14 +176,14 @@ variable "aad_group_env_adf_folder_owner" {
 
 variable "the_scopes" {
   description = "set of scope names"
-  default     = ["access","default"]
+  default     = ["access", "default"]
   type        = set(string)
 }
 
 
 variable "theSubDirectories" {
   description = "set of directory names"
-  default     = ["Archived","Exported","Ingested","Published","Raw","Transformed"]
+  default     = ["Archived", "Exported", "Ingested", "Published", "Raw", "Transformed"]
   type        = set(string)
 }
 

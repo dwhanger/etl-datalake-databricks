@@ -12,7 +12,7 @@ terraform {
       version = "=3.48.0"
     }
     azuread = {
-      source = "hashicorp/azuread"
+      source  = "hashicorp/azuread"
       version = "1.4.0"
     }
   }
@@ -28,7 +28,7 @@ provider "azuread" {
 provider "azurerm" {
   features {
     resource_group {
-        prevent_deletion_if_contains_resources = false
+      prevent_deletion_if_contains_resources = false
     }
     key_vault {
       purge_soft_delete_on_destroy = false
@@ -38,15 +38,15 @@ provider "azurerm" {
       #recover_soft_deleted_key_vaults = true
     }
   }
-//  skip_credentials_validation
+  //  skip_credentials_validation
 }
 
 data "azurerm_client_config" "current" {}
 
 locals {
-  tenant_id       = data.azurerm_client_config.current.tenant_id 
-  subscription_id = data.azurerm_client_config.current.subscription_id 
-  object_id       = data.azurerm_client_config.current.object_id  
+  tenant_id       = data.azurerm_client_config.current.tenant_id
+  subscription_id = data.azurerm_client_config.current.subscription_id
+  object_id       = data.azurerm_client_config.current.object_id
 }
 
 locals {
@@ -68,48 +68,48 @@ locals {
 //
 locals {
   devops = [
-          "20.37.158.0/23",
-          "20.37.194.0/24",
-          "20.39.13.0/26",
-          "20.41.6.0/23",
-          "20.41.194.0/24",
-          "20.42.5.0/24",
-          "20.42.134.0/23",
-          "20.42.226.0/24",
-          "20.45.196.64/26",
-          "20.189.107.0/24",
-          "20.195.68.0/24",
-          "40.74.28.0/23",
-          "40.80.187.0/24",
-          "40.82.252.0/24",
-          "40.119.10.0/24",
-          "51.104.26.0/24",
-          "52.150.138.0/24",
-          "52.228.82.0/24",
-          "191.235.226.0/24",
-          "20.51.251.83",
-          "20.98.103.209",
-          "98.232.189.107",
-          "20.37.194.0/24",
-          "20.42.226.0/24",
-          "191.235.226.0/24",
-          "52.228.82.0/24",
-          "20.37.158.0/23",
-          "20.45.196.64/26",
-          "20.189.107.0/24",
-          "20.42.5.0/24",
-          "20.41.6.0/23",
-          "20.39.13.0/26",
-          "40.80.187.0/24",
-          "40.119.10.0/24",
-          "20.41.194.0/24",
-          "20.195.68.0/24",
-          "51.104.26.0/24",
-          "52.150.138.0/24",
-          "40.74.28.0/23",
-          "40.82.252.0/24",
-          "20.42.134.0/23",
-          "76.138.138.227"
+    "20.37.158.0/23",
+    "20.37.194.0/24",
+    "20.39.13.0/26",
+    "20.41.6.0/23",
+    "20.41.194.0/24",
+    "20.42.5.0/24",
+    "20.42.134.0/23",
+    "20.42.226.0/24",
+    "20.45.196.64/26",
+    "20.189.107.0/24",
+    "20.195.68.0/24",
+    "40.74.28.0/23",
+    "40.80.187.0/24",
+    "40.82.252.0/24",
+    "40.119.10.0/24",
+    "51.104.26.0/24",
+    "52.150.138.0/24",
+    "52.228.82.0/24",
+    "191.235.226.0/24",
+    "20.51.251.83",
+    "20.98.103.209",
+    "98.232.189.107",
+    "20.37.194.0/24",
+    "20.42.226.0/24",
+    "191.235.226.0/24",
+    "52.228.82.0/24",
+    "20.37.158.0/23",
+    "20.45.196.64/26",
+    "20.189.107.0/24",
+    "20.42.5.0/24",
+    "20.41.6.0/23",
+    "20.39.13.0/26",
+    "40.80.187.0/24",
+    "40.119.10.0/24",
+    "20.41.194.0/24",
+    "20.195.68.0/24",
+    "51.104.26.0/24",
+    "52.150.138.0/24",
+    "40.74.28.0/23",
+    "40.82.252.0/24",
+    "20.42.134.0/23",
+    "76.138.138.227"
   ]
 }
 
@@ -121,7 +121,7 @@ data "local_file" "githubactions_ipaddresses" {
   filename = "${path.module}/githubactions_ipaddresses.txt"
 }
 locals {
-  githubactions_ipaddresses = split(",",trimspace(data.local_file.githubactions_ipaddresses.content))
+  githubactions_ipaddresses = split(",", trimspace(data.local_file.githubactions_ipaddresses.content))
 }
 
 resource "azurerm_resource_group" "main" {
@@ -150,14 +150,14 @@ resource "azurerm_network_security_group" "nsg" {
   resource_group_name = azurerm_resource_group.main.name
 
   security_rule {
-    name                   = "https"
-    priority               = 100
-    direction              = "Inbound"
-    access                 = "Allow"
-    protocol               = "Tcp"
-    source_port_range      = "*"
-    source_address_prefix  = "*"
-    destination_port_range = "443"
+    name                       = "https"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    source_address_prefix      = "*"
+    destination_port_range     = "443"
     destination_address_prefix = "*"
   }
   security_rule {
@@ -208,12 +208,12 @@ resource "azurerm_network_security_group" "nsg" {
     destination_address_prefix = "*"
   }
   security_rule {
-    name              = "everything_else_out"
-    priority          = 210
-    direction         = "Outbound"
-    access            = "Deny"
-    protocol          = "*"
-    source_port_range = "*"
+    name                       = "everything_else_out"
+    priority                   = 210
+    direction                  = "Outbound"
+    access                     = "Deny"
+    protocol                   = "*"
+    source_port_range          = "*"
     source_address_prefix      = "*"
     destination_port_range     = "*"
     destination_address_prefix = "*"
@@ -246,48 +246,48 @@ resource "azurerm_subnet" "subnet_addressDefault" {
 resource "azurerm_subnet" "subnet_addressGatewaySubnet" {
   depends_on = [azurerm_virtual_network.vnet]
 
-  name                      = "GatewaySubnet"
-  resource_group_name       = azurerm_resource_group.main.name
-  virtual_network_name      = azurerm_virtual_network.vnet.name
-  address_prefixes          = [var.subnet_address_gatewaySubnet]
+  name                 = "GatewaySubnet"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = [var.subnet_address_gatewaySubnet]
 }
 
 resource "azurerm_subnet" "subnet_addressPrivateSQL" {
   depends_on = [azurerm_virtual_network.vnet]
 
-  name                      = "PrivateSQL"
-  resource_group_name       = azurerm_resource_group.main.name
-  virtual_network_name      = azurerm_virtual_network.vnet.name
-  address_prefixes          = [var.subnet_address_privateSQL]
+  name                 = "PrivateSQL"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = [var.subnet_address_privateSQL]
 }
 
 resource "azurerm_subnet" "subnet_addressPrivateStorage" {
   depends_on = [azurerm_virtual_network.vnet]
 
-  name                      = "PrivateStorage"
-  resource_group_name       = azurerm_resource_group.main.name
-  virtual_network_name      = azurerm_virtual_network.vnet.name
-  address_prefixes          = [var.subnet_address_privateStorage]
+  name                 = "PrivateStorage"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = [var.subnet_address_privateStorage]
 }
 
 resource "azurerm_subnet" "subnet_addressDataFactory" {
   depends_on = [azurerm_virtual_network.vnet]
 
-  name                      = "DataFactory"
-  resource_group_name       = azurerm_resource_group.main.name
-  virtual_network_name      = azurerm_virtual_network.vnet.name
-  address_prefixes          = [var.subnet_address_dataFactory]
-  service_endpoints         = ["Microsoft.Storage","Microsoft.KeyVault"]
+  name                 = "DataFactory"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = [var.subnet_address_dataFactory]
+  service_endpoints    = ["Microsoft.Storage", "Microsoft.KeyVault"]
 }
 
 resource "azurerm_subnet" "subnet_addressDataBricksPrivate" {
   depends_on = [azurerm_virtual_network.vnet]
 
-  name                      = "DataBricksPrivate"
-  resource_group_name       = azurerm_resource_group.main.name
-  virtual_network_name      = azurerm_virtual_network.vnet.name
-  address_prefixes          = [var.subnet_address_dataBricksPrivate]
-  service_endpoints         = ["Microsoft.Storage"]
+  name                 = "DataBricksPrivate"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = [var.subnet_address_dataBricksPrivate]
+  service_endpoints    = ["Microsoft.Storage"]
 
   delegation {
     name = "workspaces_delegation"
@@ -300,10 +300,10 @@ resource "azurerm_subnet" "subnet_addressDataBricksPrivate" {
 resource "azurerm_subnet" "subnet_addressDataBricksPublic" {
   depends_on = [azurerm_virtual_network.vnet]
 
-  name                      = "DataBricksPublic"
-  resource_group_name       = azurerm_resource_group.main.name
-  virtual_network_name      = azurerm_virtual_network.vnet.name
-  address_prefixes          = [var.subnet_address_dataBricksPublic]
+  name                 = "DataBricksPublic"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = [var.subnet_address_dataBricksPublic]
   delegation {
     name = "workspaces_delegation"
     service_delegation {
@@ -357,9 +357,9 @@ resource "azurerm_storage_account" "databricks_sa" {
   account_kind              = "StorageV2"
   is_hns_enabled            = "true"
 
- network_rules {
-    default_action             = "Allow"
-    bypass                     = ["AzureServices"]
+  network_rules {
+    default_action = "Allow"
+    bypass         = ["AzureServices"]
   }
 
   tags = local.tags
@@ -377,7 +377,7 @@ resource "azurerm_storage_account" "databricks_sa" {
 resource "azurerm_storage_data_lake_gen2_filesystem" "databricks_sa_data_lake_gen2" {
   name               = "inbound"
   storage_account_id = azurerm_storage_account.databricks_sa.id
-/*
+  /*
   dynamic "ace" {
     for_each = var.the_scopes
     content {
@@ -394,13 +394,13 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "databricks_sa_data_lake_ge
 }
 
 resource "azurerm_storage_account_network_rules" "databricks_sa_network_rules" {
-  depends_on = [azurerm_storage_data_lake_gen2_filesystem.databricks_sa_data_lake_gen2]
-  storage_account_id       = azurerm_storage_account.databricks_sa.id
+  depends_on         = [azurerm_storage_data_lake_gen2_filesystem.databricks_sa_data_lake_gen2]
+  storage_account_id = azurerm_storage_account.databricks_sa.id
 
   default_action             = "Deny"
-  ip_rules                   = ["4.15.128.98","207.189.104.116","76.138.138.227"]
-  virtual_network_subnet_ids = [azurerm_subnet.subnet_addressDataBricksPrivate.id,azurerm_subnet.subnet_addressDataFactory.id]
-  bypass                     = ["Metrics","AzureServices"]
+  ip_rules                   = ["4.15.128.98", "207.189.104.116", "76.138.138.227"]
+  virtual_network_subnet_ids = [azurerm_subnet.subnet_addressDataBricksPrivate.id, azurerm_subnet.subnet_addressDataFactory.id]
+  bypass                     = ["Metrics", "AzureServices"]
 }
 
 data "azurerm_storage_account_blob_container_sas" "databricks_sa_sas_inbound" {
@@ -417,12 +417,12 @@ data "azurerm_storage_account_blob_container_sas" "databricks_sa_sas_inbound" {
   expiry = timeadd(timestamp(), "17520h")
 
   permissions {
-    read    = true
-    add     = true
-    create  = true
-    write   = true
-    delete  = true
-    list    = true
+    read   = true
+    add    = true
+    create = true
+    write  = true
+    delete = true
+    list   = true
   }
 
   cache_control       = "max-age=5"
@@ -451,11 +451,11 @@ resource "azurerm_storage_data_lake_gen2_path" "acl_payer_Baseball_theFolders" {
   dynamic "ace" {
     for_each = var.the_scopes
     content {
-        type = "group"
-        scope = ace.value
-#        id = data.azuread_group.adgroup_adf_owner.object_id
-        id = var.adfObjectid
-        permissions = "rwx"
+      type  = "group"
+      scope = ace.value
+      #        id = data.azuread_group.adgroup_adf_owner.object_id
+      id          = var.adfObjectid
+      permissions = "rwx"
     }
   }
 }
@@ -495,11 +495,11 @@ resource "azurerm_storage_data_lake_gen2_path" "acl_payer_DirectMail_theFolders"
   dynamic "ace" {
     for_each = var.the_scopes
     content {
-        type = "group"
-        scope = ace.value
-#        id = data.azuread_group.adgroup_adf_owner.object_id
-        id = var.adfObjectid
-        permissions = "rwx"
+      type  = "group"
+      scope = ace.value
+      #        id = data.azuread_group.adgroup_adf_owner.object_id
+      id          = var.adfObjectid
+      permissions = "rwx"
     }
   }
 }
@@ -519,11 +519,11 @@ resource "azurerm_storage_data_lake_gen2_path" "acl_payer_HomeCredit_theFolders"
   dynamic "ace" {
     for_each = var.the_scopes
     content {
-        type = "group"
-        scope = ace.value
-#        id = data.azuread_group.adgroup_adf_owner.object_id
-        id = var.adfObjectid
-        permissions = "rwx"
+      type  = "group"
+      scope = ace.value
+      #        id = data.azuread_group.adgroup_adf_owner.object_id
+      id          = var.adfObjectid
+      permissions = "rwx"
     }
   }
 }
@@ -543,11 +543,11 @@ resource "azurerm_storage_data_lake_gen2_path" "acl_payer_Models_theFolders" {
   dynamic "ace" {
     for_each = var.the_scopes
     content {
-        type = "group"
-        scope = ace.value
-#        id = data.azuread_group.adgroup_adf_owner.object_id
-        id = var.adfObjectid
-        permissions = "rwx"
+      type  = "group"
+      scope = ace.value
+      #        id = data.azuread_group.adgroup_adf_owner.object_id
+      id          = var.adfObjectid
+      permissions = "rwx"
     }
   }
 }
@@ -567,11 +567,11 @@ resource "azurerm_storage_data_lake_gen2_path" "acl_payer_PowerCurve_theFolders"
   dynamic "ace" {
     for_each = var.the_scopes
     content {
-        type = "group"
-        scope = ace.value
-#        id = data.azuread_group.adgroup_adf_owner.object_id
-        id = var.adfObjectid
-        permissions = "rwx"
+      type  = "group"
+      scope = ace.value
+      #        id = data.azuread_group.adgroup_adf_owner.object_id
+      id          = var.adfObjectid
+      permissions = "rwx"
     }
   }
 }
@@ -603,14 +603,14 @@ data "azurerm_key_vault_secret" "vsts_pat_keyvault_secret" {
 # BYOK key for ADF....
 #
 resource "random_string" "forKeyvault" {
-  length           = 8
-  special          = false
+  length  = 8
+  special = false
 }
 
 locals {
   kv_temp_name = "${var.short_name}${var.environment}-${var.region}-${var.name}-${var.platform}-${random_string.forKeyvault.result}"
   kv_base_name = lower(replace(local.kv_temp_name, "/[[:^alnum:]]/", ""))
-  kv_name = "${substr( local.kv_base_name, 0, length(local.kv_base_name) < 21 ? -1 : 21 )}"
+  kv_name      = substr(local.kv_base_name, 0, length(local.kv_base_name) < 21 ? -1 : 21)
 }
 
 resource "azurerm_user_assigned_identity" "uaidentity" {
@@ -621,15 +621,15 @@ resource "azurerm_user_assigned_identity" "uaidentity" {
 
 resource "azurerm_key_vault" "keyvault" {
 
-  name                     = "${local.kv_name}-kv"
-  location                 = azurerm_resource_group.main.location
-  resource_group_name      = azurerm_resource_group.main.name
-  tenant_id                = local.tenant_id 
-  sku_name                 = "premium"
-  purge_protection_enabled = true
+  name                       = "${local.kv_name}-kv"
+  location                   = azurerm_resource_group.main.location
+  resource_group_name        = azurerm_resource_group.main.name
+  tenant_id                  = local.tenant_id
+  sku_name                   = "premium"
+  purge_protection_enabled   = true
   soft_delete_retention_days = 7
-  
-access_policy {
+
+  access_policy {
     tenant_id = local.tenant_id
     object_id = local.object_id
 
@@ -647,14 +647,14 @@ access_policy {
     secret_permissions = [
       "Set",
     ]
-  }    
+  }
 
   network_acls {
     bypass         = "AzureServices"
     default_action = "Deny"
-#    ip_rules       = ["20.51.251.83","20.98.103.209","98.232.189.107","13.65.175.147"]
-#    ip_rules       = local.devops
-    ip_rules       = local.githubactions_ipaddresses
+    #    ip_rules       = ["20.51.251.83","20.98.103.209","98.232.189.107","13.65.175.147"]
+    #    ip_rules       = local.devops
+    ip_rules                   = local.githubactions_ipaddresses
     virtual_network_subnet_ids = [azurerm_subnet.subnet_addressDataFactory.id]
   }
 }
@@ -683,19 +683,19 @@ resource "azurerm_key_vault_access_policy" "azure_cli_policy" {
 resource "azurerm_key_vault_access_policy" "azure_dmw_policy" {
 
   key_vault_id = azurerm_key_vault.keyvault.id
-  tenant_id = local.tenant_id
-  object_id = var.operatorDMWObjectid
+  tenant_id    = local.tenant_id
+  object_id    = var.operatorDMWObjectid
 
   key_permissions = [
-      "Create", "List", "Get", "Delete", "Purge", "Recover", "Restore", "UnwrapKey", "WrapKey", "GetRotationPolicy", "SetRotationPolicy", "Rotate", "Release", "Update", "Verify", "Decrypt", "Encrypt", "Sign"
+    "Create", "List", "Get", "Delete", "Purge", "Recover", "Restore", "UnwrapKey", "WrapKey", "GetRotationPolicy", "SetRotationPolicy", "Rotate", "Release", "Update", "Verify", "Decrypt", "Encrypt", "Sign"
   ]
 
   secret_permissions = [
-      "List", "Get", "Delete", "Recover", "Restore", "Set"
+    "List", "Get", "Delete", "Recover", "Restore", "Set"
   ]
 
   certificate_permissions = [
-      "Create", "List", "Get", "Delete", "Purge", "Recover", "Restore"
+    "Create", "List", "Get", "Delete", "Purge", "Recover", "Restore"
   ]
 
 }
@@ -704,19 +704,19 @@ resource "azurerm_key_vault_access_policy" "azure_dmw_policy" {
 resource "azurerm_key_vault_access_policy" "azure_uaidentity_policy" {
 
   key_vault_id = azurerm_key_vault.keyvault.id
-  tenant_id = local.tenant_id
-  object_id = azurerm_user_assigned_identity.uaidentity.principal_id
+  tenant_id    = local.tenant_id
+  object_id    = azurerm_user_assigned_identity.uaidentity.principal_id
 
   key_permissions = [
-      "Create", "List", "Get", "Delete", "Purge", "Recover", "Restore", "UnwrapKey", "WrapKey", "GetRotationPolicy", "SetRotationPolicy", "Rotate", "Release", "Update", "Verify", "Decrypt", "Encrypt", "Sign"
+    "Create", "List", "Get", "Delete", "Purge", "Recover", "Restore", "UnwrapKey", "WrapKey", "GetRotationPolicy", "SetRotationPolicy", "Rotate", "Release", "Update", "Verify", "Decrypt", "Encrypt", "Sign"
   ]
 
   secret_permissions = [
-      "List", "Get", "Delete", "Recover", "Restore", "Set"
+    "List", "Get", "Delete", "Recover", "Restore", "Set"
   ]
 
   certificate_permissions = [
-      "Create", "List", "Get", "Delete", "Purge", "Recover", "Restore"
+    "Create", "List", "Get", "Delete", "Purge", "Recover", "Restore"
   ]
 
 }
@@ -760,17 +760,17 @@ locals {
 resource "azurerm_databricks_workspace" "databricks_workspace" {
   count = var.enable_databricks_creation ? 1 : 0
 
-  name                                      = local.ws_name
-  resource_group_name                       = azurerm_resource_group.main.name
-  location                                  = azurerm_resource_group.main.location
-  sku                                       = "premium"
-  customer_managed_key_enabled              = true
-  managed_resource_group_name               = "${local.ws_name}-DBW-managed-services"
-  public_network_access_enabled             = true
-  network_security_group_rules_required     = "NoAzureDatabricksRules"
+  name                                  = local.ws_name
+  resource_group_name                   = azurerm_resource_group.main.name
+  location                              = azurerm_resource_group.main.location
+  sku                                   = "premium"
+  customer_managed_key_enabled          = true
+  managed_resource_group_name           = "${local.ws_name}-DBW-managed-services"
+  public_network_access_enabled         = true
+  network_security_group_rules_required = "NoAzureDatabricksRules"
 
   custom_parameters {
-    no_public_ip = true
+    no_public_ip        = true
     virtual_network_id  = azurerm_virtual_network.vnet.id
     private_subnet_name = azurerm_subnet.subnet_addressDataBricksPrivate.name
     public_subnet_name  = azurerm_subnet.subnet_addressDataBricksPublic.name
@@ -787,7 +787,7 @@ resource "azurerm_databricks_workspace_customer_managed_key" "databrickscmkey" {
   depends_on = [azurerm_key_vault_key.cmkey]
 
   workspace_id     = azurerm_databricks_workspace.databricks_workspace[0].id
-  key_vault_key_id = azurerm_key_vault_key.cmkey.id 
+  key_vault_key_id = azurerm_key_vault_key.cmkey.id
 }
 
 resource "azurerm_key_vault_key" "cmkey" {
@@ -838,18 +838,18 @@ locals {
 }
 
 resource "azurerm_data_factory" "data_factoryv2" {
-  depends_on = [azurerm_databricks_workspace.databricks_workspace]
+  depends_on          = [azurerm_databricks_workspace.databricks_workspace]
   name                = local.df_name
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
 
   identity {
-    type              = "SystemAssigned"
+    type = "SystemAssigned"
   }
   #
   # Add this block of code only for the devint stack, not for qa, stage, or prod
   # 
-   dynamic "github_configuration" {
+  dynamic "github_configuration" {
     for_each = var.devops_git_setup
     content {
       account_name    = var.repo_account_name
@@ -864,18 +864,18 @@ resource "azurerm_data_factory" "data_factoryv2" {
 }
 
 resource "azurerm_data_factory_integration_runtime_azure_ssis" "data_factoryv2_integration_runtime" {
-  name                = "${local.df_name}-int-runtime"
-  data_factory_id     = azurerm_data_factory.data_factoryv2.id
-  location            = azurerm_resource_group.main.location
+  name            = "${local.df_name}-int-runtime"
+  data_factory_id = azurerm_data_factory.data_factoryv2.id
+  location        = azurerm_resource_group.main.location
 
-  node_size           = "Standard_D8_v3"
-  number_of_nodes     = 3
+  node_size                        = "Standard_D8_v3"
+  number_of_nodes                  = 3
   max_parallel_executions_per_node = 3
-  edition             = "Enterprise"
-  license_type        = "LicenseIncluded"
+  edition                          = "Enterprise"
+  license_type                     = "LicenseIncluded"
 
   vnet_integration {
-    vnet_id = azurerm_virtual_network.vnet.id
+    vnet_id     = azurerm_virtual_network.vnet.id
     subnet_name = azurerm_subnet.subnet_addressDataFactory.name
   }
 }
