@@ -132,206 +132,29 @@ resource "azurerm_resource_group" "main" {
   tags = local.tags
 }
 
-locals {
-  nsg_temp_name = "${var.short_name}${var.environment}-${var.region}-${var.platform}-${var.name}"
-  nsg_base_name = lower(replace(local.nsg_temp_name, "/[[:^alnum:]]/", ""))
-  nsg_name = "${substr(
-    local.nsg_base_name,
-    0,
-    length(local.nsg_base_name) < 21 ? -1 : 21,
-  )}-nsg"
-}
+#
+# Load up our module where we have the vnet, nsgs, and subnets defined...
+#
+module "azure_vnet_nsg_subnet" {
+  source = "./modules/azure-vnet-nsg-subnet"
 
-resource "azurerm_network_security_group" "nsg" {
-  depends_on = [azurerm_resource_group.main]
-
-  name                = local.nsg_name
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-
-  security_rule {
-    name                       = "https"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    source_address_prefix      = "*"
-    destination_port_range     = "443"
-    destination_address_prefix = "*"
-  }
-  security_rule {
-    name                       = "http"
-    priority                   = 110
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "80"
-    source_address_prefix      = "*"
-    destination_port_range     = "*"
-    destination_address_prefix = "*"
-  }
-  security_rule {
-    name              = "http_Out"
-    priority          = 120
-    direction         = "Outbound"
-    access            = "Allow"
-    protocol          = "Tcp"
-    source_port_range = "*"
-
-    source_address_prefix      = "*"
-    destination_port_range     = "80"
-    destination_address_prefix = "*"
-  }
-  security_rule {
-    name              = "https_Out"
-    priority          = 130
-    direction         = "Outbound"
-    access            = "Allow"
-    protocol          = "Tcp"
-    source_port_range = "*"
-
-    source_address_prefix      = "*"
-    destination_port_range     = "443"
-    destination_address_prefix = "*"
-  }
-  security_rule {
-    name                   = "everything_else_in"
-    priority               = 200
-    direction              = "Inbound"
-    access                 = "Deny"
-    protocol               = "*"
-    source_port_range      = "*"
-    source_address_prefix  = "*"
-    destination_port_range = "*"
-
-    destination_address_prefix = "*"
-  }
-  security_rule {
-    name                       = "everything_else_out"
-    priority                   = 210
-    direction                  = "Outbound"
-    access                     = "Deny"
-    protocol                   = "*"
-    source_port_range          = "*"
-    source_address_prefix      = "*"
-    destination_port_range     = "*"
-    destination_address_prefix = "*"
-  }
-}
-
-
-locals {
-  vnet_temp_name = "${var.short_name}${var.environment}-${var.region}-${var.platform}-${var.name}"
-  vnet_base_name = lower(replace(local.vnet_temp_name, "/[[:^alnum:]]/", ""))
-  vnet_name = "${substr(
-    local.vnet_base_name,
-    0,
-    length(local.vnet_base_name) < 20 ? -1 : 20,
-  )}-vnet"
-}
-/*
-resource "azurerm_subnet" "subnet_addressDefault" {
-  depends_on = [azurerm_virtual_network.vnet]
-
-  name                      = "default"
-  resource_group_name       = azurerm_resource_group.main.name
-  virtual_network_name      = azurerm_virtual_network.vnet.name
-  address_prefixes          = [var.subnet_address_default]
-#  network_security_group_id = azurerm_network_security_group.nsg.id
-#  service_endpoints         = ["Microsoft.Storage"]
-}
-*/
-
-resource "azurerm_subnet" "subnet_addressGatewaySubnet" {
-  depends_on = [azurerm_virtual_network.vnet]
-
-  name                 = "GatewaySubnet"
-  resource_group_name  = azurerm_resource_group.main.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = [var.subnet_address_gatewaySubnet]
-}
-
-resource "azurerm_subnet" "subnet_addressPrivateSQL" {
-  depends_on = [azurerm_virtual_network.vnet]
-
-  name                 = "PrivateSQL"
-  resource_group_name  = azurerm_resource_group.main.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = [var.subnet_address_privateSQL]
-}
-
-resource "azurerm_subnet" "subnet_addressPrivateStorage" {
-  depends_on = [azurerm_virtual_network.vnet]
-
-  name                 = "PrivateStorage"
-  resource_group_name  = azurerm_resource_group.main.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = [var.subnet_address_privateStorage]
-}
-
-resource "azurerm_subnet" "subnet_addressDataFactory" {
-  depends_on = [azurerm_virtual_network.vnet]
-
-  name                 = "DataFactory"
-  resource_group_name  = azurerm_resource_group.main.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = [var.subnet_address_dataFactory]
-  service_endpoints    = ["Microsoft.Storage", "Microsoft.KeyVault"]
-}
-
-resource "azurerm_subnet" "subnet_addressDataBricksPrivate" {
-  depends_on = [azurerm_virtual_network.vnet]
-
-  name                 = "DataBricksPrivate"
-  resource_group_name  = azurerm_resource_group.main.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = [var.subnet_address_dataBricksPrivate]
-  service_endpoints    = ["Microsoft.Storage"]
-
-  delegation {
-    name = "workspaces_delegation"
-    service_delegation {
-      name = "Microsoft.Databricks/workspaces"
-    }
-  }
-}
-
-resource "azurerm_subnet" "subnet_addressDataBricksPublic" {
-  depends_on = [azurerm_virtual_network.vnet]
-
-  name                 = "DataBricksPublic"
-  resource_group_name  = azurerm_resource_group.main.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = [var.subnet_address_dataBricksPublic]
-  delegation {
-    name = "workspaces_delegation"
-    service_delegation {
-      name = "Microsoft.Databricks/workspaces"
-    }
-  }
-}
-
-
-resource "azurerm_subnet_network_security_group_association" "nsg_addressDataBricksPrivate" {
-  subnet_id                 = azurerm_subnet.subnet_addressDataBricksPrivate.id
-  network_security_group_id = azurerm_network_security_group.nsg.id
-}
-
-resource "azurerm_subnet_network_security_group_association" "nsg_addressDataBricksPublic" {
-  subnet_id                 = azurerm_subnet.subnet_addressDataBricksPublic.id
-  network_security_group_id = azurerm_network_security_group.nsg.id
-}
-
-resource "azurerm_virtual_network" "vnet" {
-  depends_on = [azurerm_resource_group.main]
-
-  name                = local.vnet_name
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-  address_space       = [var.vnet_address_space]
-
-  tags = local.tags
+  resgroup_main_location                  = azurerm_resource_group.main.location
+  resgroup_main_name                      = azurerm_resource_group.main.name
+  name                                    = var.name
+  short_name                              = var.short_name
+  location                                = var.location
+  platform                                = var.platform
+  region                                  = var.region
+  environment                             = var.environment
+  vnet_address_space                      = var.vnet_address_space
+  subnet_address_prefix_default           = var.subnet_address_default
+  subnet_address_prefix_gatewaySubnet     = var.subnet_address_gatewaySubnet
+  subnet_address_prefix_privateSQL        = var.subnet_address_privateSQL
+  subnet_address_prefix_privateStorage    = var.subnet_address_privateStorage
+  subnet_address_prefix_dataFactory       = var.subnet_address_dataFactory
+  subnet_address_prefix_dataBricksPrivate = var.subnet_address_dataBricksPrivate
+  subnet_address_prefix_dataBricksPublic  = var.subnet_address_dataBricksPublic
+  tags                                    = local.tags
 }
 
 locals {
@@ -374,6 +197,7 @@ resource "azurerm_storage_account" "databricks_sa" {
 #  security_enabled = true
 #}
 
+
 resource "azurerm_storage_data_lake_gen2_filesystem" "databricks_sa_data_lake_gen2" {
   name               = "inbound"
   storage_account_id = azurerm_storage_account.databricks_sa.id
@@ -383,7 +207,8 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "databricks_sa_data_lake_ge
     content {
         type = "group"
         scope = ace.value
-        id = data.azuread_group.adgroup_adf_owner.object_id
+        #id = data.azuread_group.adgroup_adf_owner.object_id
+        id          = var.adfObjectid
         permissions = "rwx"
     }
   }
@@ -393,13 +218,14 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "databricks_sa_data_lake_ge
 */
 }
 
+
 resource "azurerm_storage_account_network_rules" "databricks_sa_network_rules" {
   depends_on         = [azurerm_storage_data_lake_gen2_filesystem.databricks_sa_data_lake_gen2]
   storage_account_id = azurerm_storage_account.databricks_sa.id
 
   default_action             = "Deny"
   ip_rules                   = ["4.15.128.98", "207.189.104.116", "76.138.138.227"]
-  virtual_network_subnet_ids = [azurerm_subnet.subnet_addressDataBricksPrivate.id, azurerm_subnet.subnet_addressDataFactory.id]
+  virtual_network_subnet_ids = [module.azure_vnet_nsg_subnet.subnet_address_prefix_dataBricksPrivate.id, module.azure_vnet_nsg_subnet.subnet_address_prefix_dataFactory.id]
   bypass                     = ["Metrics", "AzureServices"]
 }
 
@@ -442,14 +268,15 @@ data "azurerm_storage_account_blob_container_sas" "databricks_sa_sas_inbound" {
 resource "azurerm_storage_data_lake_gen2_path" "acl_payer_Baseball_theFolders" {
   depends_on = [azurerm_storage_data_lake_gen2_filesystem.databricks_sa_data_lake_gen2]
 
-  filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.databricks_sa_data_lake_gen2.name
   storage_account_id = azurerm_storage_account.databricks_sa.id
+  filesystem_name    = azurerm_storage_data_lake_gen2_filesystem.databricks_sa_data_lake_gen2.name
   for_each           = var.theSubDirectories
   path               = "Baseball/${each.key}"
   resource           = "directory"
 
   dynamic "ace" {
     for_each = var.the_scopes
+    
     content {
       type  = "group"
       scope = ace.value
@@ -478,7 +305,6 @@ resource "null_resource" "copy_over_baseball_stats_files_to_raw" {
     on_failure = continue
   }
 }
-
 
 #
 # Setup container folders for DirectMail...
@@ -576,7 +402,6 @@ resource "azurerm_storage_data_lake_gen2_path" "acl_payer_PowerCurve_theFolders"
   }
 }
 
-
 #
 # az keyvault secret show --name "vsts-pat-dev-azure-com-gfs2" --vault-name "gfs-nn-terraform-akv" --query value --output tsv
 #
@@ -586,6 +411,7 @@ resource "azurerm_storage_data_lake_gen2_path" "acl_payer_PowerCurve_theFolders"
 #
 #.....az command works from the command line but not from within TF.....using the tf object model below, works like a champ!
 #
+/*
 data "azurerm_key_vault" "data_terraform_akv" {
 
   name                = var.key_vault_name
@@ -598,6 +424,7 @@ data "azurerm_key_vault_secret" "vsts_pat_keyvault_secret" {
   name         = "vsts-pat-dev-azure-com-azx-tyeesoftware"
   key_vault_id = data.azurerm_key_vault.data_terraform_akv.id
 }
+*/
 
 ####
 # BYOK key for ADF....
@@ -655,7 +482,7 @@ resource "azurerm_key_vault" "keyvault" {
     #    ip_rules       = ["20.51.251.83","20.98.103.209","98.232.189.107","13.65.175.147"]
     #    ip_rules       = local.devops
     ip_rules                   = local.githubactions_ipaddresses
-    virtual_network_subnet_ids = [azurerm_subnet.subnet_addressDataFactory.id]
+    virtual_network_subnet_ids = [module.azure_vnet_nsg_subnet.subnet_address_prefix_dataFactory.id]
   }
 }
 /*
@@ -771,12 +598,12 @@ resource "azurerm_databricks_workspace" "databricks_workspace" {
 
   custom_parameters {
     no_public_ip        = true
-    virtual_network_id  = azurerm_virtual_network.vnet.id
-    private_subnet_name = azurerm_subnet.subnet_addressDataBricksPrivate.name
-    public_subnet_name  = azurerm_subnet.subnet_addressDataBricksPublic.name
+    virtual_network_id  = module.azure_vnet_nsg_subnet.vnet.id
+    private_subnet_name = module.azure_vnet_nsg_subnet.subnet_address_prefix_dataBricksPrivate.name 
+    public_subnet_name  = module.azure_vnet_nsg_subnet.subnet_address_prefix_dataBricksPublic.name
 
-    public_subnet_network_security_group_association_id  = azurerm_subnet_network_security_group_association.nsg_addressDataBricksPublic.id
-    private_subnet_network_security_group_association_id = azurerm_subnet_network_security_group_association.nsg_addressDataBricksPrivate.id
+    public_subnet_network_security_group_association_id  = module.azure_vnet_nsg_subnet.nsg_addressDataBricksPublic.id
+    private_subnet_network_security_group_association_id = module.azure_vnet_nsg_subnet.nsg_addressDataBricksPrivate.id
   }
 
   tags = local.tags
@@ -875,8 +702,8 @@ resource "azurerm_data_factory_integration_runtime_azure_ssis" "data_factoryv2_i
   license_type                     = "LicenseIncluded"
 
   vnet_integration {
-    vnet_id     = azurerm_virtual_network.vnet.id
-    subnet_name = azurerm_subnet.subnet_addressDataFactory.name
+    vnet_id     = module.azure_vnet_nsg_subnet.vnet.id
+    subnet_name = module.azure_vnet_nsg_subnet.subnet_address_prefix_dataFactory.name
   }
 }
 
