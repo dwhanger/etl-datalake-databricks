@@ -41,17 +41,29 @@ jobs:
         terraform_wrapper: false
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    # export TF_CLI_ARGS_init='-backend-config="storage_account_name=tysdscinfratfsa" -backend-config="container_name=databricks" -backend-config="key=devintus-stack" -backend-config="resource_group_name=terraform-sc-rg" 
+    # -backend-config="subscription_id=${{ env.ARM_SUBSCRIPTION_ID }}" -backend-config="tenant_id=${{ env.ARM_TENANT_ID }}" -backend-config="access_key=${{ env.ARM_ACCESS_KEY }}" -backend-config="client_id=${{ env.ARM_CLIENT_ID }}" -backend-config="client_secret=${{ env.ARM_CLIENT_SECRET }}"'
     - name: Terraform Init
-      run: terraform init
+      run: |
+        export TF_CLI_ARGS_init='-backend-config="storage_account_name=tysdscinfratfsa" -backend-config="container_name=databricks" -backend-config="key=devintus-stack" -backend-config="resource_group_name=terraform-sc-rg"'
+        export TF_VAR_subscriptionid=${{ env.ARM_SUBSCRIPTION_ID }}
+        export TF_VAR_tenantid=${{ env.ARM_TENANT_ID }}
+        export TF_VAR_clientid=${{ env.ARM_CLIENT_ID }}
+        export TF_VAR_clientsecret=${{ env.ARM_CLIENT_SECRET }}
+        terraform init -var-file=devintus.tfvars -backend=true -reconfigure
 
     # Generates an execution plan for Terraform
     # An exit code of 0 indicated no changes, 1 a terraform failure, 2 there are pending changes.
     - name: Terraform Plan
       id: tf-plan
       run: |
+        export TF_VAR_subscriptionid=${{ env.ARM_SUBSCRIPTION_ID }}
+        export TF_VAR_tenantid=${{ env.ARM_TENANT_ID }}
+        export TF_VAR_clientid=${{ env.ARM_CLIENT_ID }}
+        export TF_VAR_clientsecret=${{ env.ARM_CLIENT_SECRET }}
         export exitcode=0
-        terraform plan -detailed-exitcode -no-color -out tfplan || export exitcode=$?
-        
+        terraform plan -var-file=devintus.tfvars -detailed-exitcode -out tfplan || export exitcode=$?
+      
         echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
         
         if [ $exitcode -eq 1 ]; then
